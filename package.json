@@ -1,0 +1,23 @@
+{
+  "name": "phaser_mmo_game",
+  "version": "1.0.0",
+  "description": "",
+  "main": "server/index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node --inspect server/index.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "canvas": "^2.6.0",
+    "datauri": "^1.1.0",
+    "express": "^4.17.1",
+    "jsdom": "^13.2.0",
+    "socket.io": "^2.2.0"
+  },
+  "engines": {
+    "node": "8.9.4"
+  }
+}
