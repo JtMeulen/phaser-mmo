@@ -49,7 +49,7 @@ function create() {
   });
 
   io.on('connection', function (socket) {
-    console.log('a user connected');
+    console.log('a user connected with socket ID: ', socket.id);
     // create a new player and add it to our players object
     players[socket.id] = {
       rotation: 0,
@@ -75,7 +75,7 @@ function create() {
     socket.emit('updateScore', self.scores);
 
     socket.on('disconnect', function () {
-      console.log('user disconnected');
+      console.log('user disconnected with socket ID: ', socket.id);
       // remove player from server
       removePlayer(self, socket.id);
       // remove this player from our players object
