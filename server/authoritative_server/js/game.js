@@ -22,14 +22,11 @@ const config = {
 
 function preload() {
   this.load.image('ship', 'assets/spaceShips_001.png');
-  this.load.image('star', 'assets/star_gold.png');
 }
 
 function create() {
   const self = this;
   this.players = this.physics.add.group();
-
-  this.physics.add.collider(this.players);
 
   io.on('connection', function (socket) {
     console.log('a user connected with socket ID: ', socket.id);
@@ -67,6 +64,10 @@ function create() {
       handlePlayerInput(self, socket.id, inputData);
     });
   });
+
+  // this.physics.add.collider(this.players, this.players, function (player) {
+  //   console.log('something')
+  // });
 }
 
 function update() {
