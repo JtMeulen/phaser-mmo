@@ -20,16 +20,22 @@ function preload() {
       frameWidth: 64, frameHeight: 64
     });
   };
+
+  this.load.image('terrain', 'assets/maps/terrain_atlas.png');
+  this.load.tilemapTiledJSON('world_map', 'assets/maps/world_map.json');
 }
 
 function create() {
   const self = this;
   this.socket = io();
   this.players = this.add.group();
+  this.cameras.main.setSize(800, 600);
 
   this.socket.on('currentPlayers', function (players) {
     Object.keys(players).forEach(function (id) {
-        displayPlayers(self, players[id]);
+      const followCam = players[id].playerId === self.socket.id;
+
+      displayPlayers(self, players[id], followCam);
     });
   });
 
@@ -64,6 +70,14 @@ function create() {
 
   createAnimations(self);
 
+  const world_map = this.add.tilemap('world_map');
+  const terrain = world_map.addTilesetImage('terrain_atlas', 'terrain');
+
+  const bottomLayer = world_map.createStaticLayer('bottom', [terrain], 0, 0).setDepth(-1);
+  const topLayer = world_map.createStaticLayer('top', [terrain], 0, 0).setDepth(2);
+
+  topLayer.setCollisionByProperty({collides: true});
+
   this.cursors = this.input.keyboard.createCursorKeys();
   this.leftKeyPressed = false;
   this.rightKeyPressed = false;
@@ -87,11 +101,16 @@ function update() {
   }
 }
 
-function displayPlayers(self, playerInfo) {
+function displayPlayers(self, playerInfo, followCam) {
   const player = self.add.sprite(playerInfo.x, playerInfo.y, `character_${playerInfo.characterType}`)
   player.setOrigin(0.5, 0.5).setDisplaySize(64, 64);
 
   player.playerId = playerInfo.playerId;
+
+  if (followCam) {
+    self.cameras.main.startFollow(player);
+  }
+
   self.players.add(player);
 }
 

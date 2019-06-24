@@ -24,6 +24,9 @@ function preload() {
   this.load.spritesheet('character_1', 'assets/character_1.png', {
     frameWidth: 64, frameHeight: 64
   });
+
+  this.load.image('terrain', 'assets/maps/terrain_atlas.png');
+  this.load.tilemapTiledJSON('world_map', 'assets/maps/world_map.json');
 }
 
 function create() {
@@ -35,8 +38,8 @@ function create() {
     console.log('a user connected with socket ID: ', socket.id);
     // create a new player and add it to our players object
     players[socket.id] = {
-      x: 100,
-      y: 100,
+      x: 300,
+      y: 300,
       characterType: Math.floor(Math.random() * 2) + 1, // TODO: get from database
       playerId: socket.id,
       moving: false,
@@ -69,6 +72,16 @@ function create() {
       handlePlayerInput(self, socket.id, inputData);
     });
   });
+
+  const world_map = this.add.tilemap('world_map');
+  const terrain = world_map.addTilesetImage('terrain_atlas', 'terrain');
+
+  const bottomLayer = world_map.createStaticLayer('bottom', [terrain], 0, 0).setDepth(-1);
+  const topLayer = world_map.createStaticLayer('top', [terrain], 0, 0);
+  this.physics.add.collider(this.players, bottomLayer);
+  this.physics.add.collider(this.players, topLayer);
+  bottomLayer.setCollisionByProperty({collides: true});
+  topLayer.setCollisionByProperty({collides: true});
 }
 
 function update() {
