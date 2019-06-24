@@ -16,7 +16,6 @@ const TOTAL_CHAR_TYPES = 2
 
 function preload() {
   for(let i = 1; i <= TOTAL_CHAR_TYPES; i++) {
-    console.log(i);
     this.load.spritesheet(`character_${i}`, `assets/characters/character_${i}.png`, {
       frameWidth: 64, frameHeight: 64
     });
@@ -97,75 +96,41 @@ function displayPlayers(self, playerInfo) {
 }
 
 function createAnimations(self) {
-  self.anims.create({
-    key: '1_up',
-    frames: self.anims.generateFrameNumbers('character_1', {
-      start: 0, end: 8
-    }),
-    frameRate: 10,
-    repeat: -1
-  });
+  for(let i = 1; i <= TOTAL_CHAR_TYPES; i++) {
+    self.anims.create({
+      key: `${i}_up`,
+      frames: self.anims.generateFrameNumbers(`character_${i}`, {
+        start: 0, end: 8
+      }),
+      frameRate: 10,
+      repeat: -1
+    });
 
-  self.anims.create({
-    key: '1_left',
-    frames: self.anims.generateFrameNumbers('character_1', {
-      start: 9, end: 17
-    }),
-    frameRate: 10,
-    repeat: -1
-  });
+    self.anims.create({
+      key: `${i}_left`,
+      frames: self.anims.generateFrameNumbers(`character_${i}`, {
+        start: 9, end: 17
+      }),
+      frameRate: 10,
+      repeat: -1
+    });
 
-  self.anims.create({
-    key: '1_down',
-    frames: self.anims.generateFrameNumbers('character_1', {
-      start: 18, end: 26
-    }),
-    frameRate: 10,
-    repeat: -1
-  });
+    self.anims.create({
+      key: `${i}_down`,
+      frames: self.anims.generateFrameNumbers(`character_${i}`, {
+        start: 18, end: 26
+      }),
+      frameRate: 10,
+      repeat: -1
+    });
 
-  self.anims.create({
-    key: '1_right',
-    frames: self.anims.generateFrameNumbers('character_1', {
-      start: 27, end: 35
-    }),
-    frameRate: 10,
-    repeat: -1
-  });
-
-  self.anims.create({
-    key: '2_up',
-    frames: self.anims.generateFrameNumbers('character_2', {
-      start: 0, end: 8
-    }),
-    frameRate: 10,
-    repeat: -1
-  });
-
-  self.anims.create({
-    key: '2_left',
-    frames: self.anims.generateFrameNumbers('character_2', {
-      start: 9, end: 17
-    }),
-    frameRate: 10,
-    repeat: -1
-  });
-
-  self.anims.create({
-    key: '2_down',
-    frames: self.anims.generateFrameNumbers('character_2', {
-      start: 18, end: 26
-    }),
-    frameRate: 10,
-    repeat: -1
-  });
-
-  self.anims.create({
-    key: '2_right',
-    frames: self.anims.generateFrameNumbers('character_2', {
-      start: 27, end: 35
-    }),
-    frameRate: 10,
-    repeat: -1
-  });
+    self.anims.create({
+      key: `${i}_right`,
+      frames: self.anims.generateFrameNumbers(`character_${i}`, {
+        start: 27, end: 35
+      }),
+      frameRate: 10,
+      repeat: -1
+    });
+  };
 }

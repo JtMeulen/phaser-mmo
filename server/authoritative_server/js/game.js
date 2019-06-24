@@ -21,12 +21,15 @@ const config = {
 };
 
 function preload() {
-  this.load.image('ship', 'assets/spaceShips_001.png');
+  this.load.spritesheet('character_1', 'assets/character_1.png', {
+    frameWidth: 64, frameHeight: 64
+  });
 }
 
 function create() {
   const self = this;
   this.players = this.physics.add.group();
+  this.physics.add.collider(this.players, this.players);
 
   io.on('connection', function (socket) {
     console.log('a user connected with socket ID: ', socket.id);
@@ -66,37 +69,34 @@ function create() {
       handlePlayerInput(self, socket.id, inputData);
     });
   });
-
-  // this.physics.add.collider(this.players, this.players, function (player) {
-  //   console.log('something')
-  // });
 }
 
 function update() {
   this.players.getChildren().forEach((player) => {
     const input = players[player.playerId].input;
 
-    if (input.left) {
+    if (input.left && !player.body.touching.left) {
       players[player.playerId].moving = 'left';
-      player.x -= 3
+      player.setVelocityX(-100);
     };
 
-    if (input.right) {
+    if (input.right && !player.body.touching.right) {
       players[player.playerId].moving = 'right';
-      player.x += 3
+      player.setVelocityX(100);
     };
 
-    if (input.down) {
+    if (input.down && !player.body.touching.down) {
       players[player.playerId].moving = 'down';
-      player.y += 3
+      player.setVelocityY(100);
     };
 
-    if (input.up) {
+    if (input.up && !player.body.touching.up) {
       players[player.playerId].moving = 'up';
-      player.y -= 3
+      player.setVelocityY(-100);
     };
 
     if (!input.left && !input.right && !input.down && !input.up) {
+      player.setVelocity(0, 0);
       players[player.playerId].moving = false;
     }
 
@@ -104,22 +104,23 @@ function update() {
     players[player.playerId].y = player.y;
   });
 
-  this.physics.world.wrap(this.players, 5);
   io.emit('playerUpdates', players);
 }
 
 function handlePlayerInput(self, playerId, input) {
   self.players.getChildren().forEach((player) => {
     if (playerId === player.playerId) {
-      console.log('')
       players[player.playerId].input = input;
     }
   });
 }
 
 function addPlayer(self, playerInfo) {
-  const player = self.physics.add.image(playerInfo.x, playerInfo.y, 'ship').setOrigin(0.5, 0.5).setDisplaySize(64, 64);
+  const player = self.physics.add.sprite(playerInfo.x, playerInfo.y, 'character_1')
+  .setOrigin(0.5, 0.5).setDisplaySize(30, 45);
   player.playerId = playerInfo.playerId;
+  player.setBounce(0);
+  player.setCollideWorldBounds(true);
   self.players.add(player);
 }
 
