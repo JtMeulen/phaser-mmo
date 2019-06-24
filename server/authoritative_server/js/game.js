@@ -34,7 +34,9 @@ function create() {
     players[socket.id] = {
       x: 100,
       y: 100,
+      characterType: Math.floor(Math.random() * 2) + 1, // TODO: get from database
       playerId: socket.id,
+      moving: false,
       input: {
         left: false,
         right: false,
@@ -74,10 +76,29 @@ function update() {
   this.players.getChildren().forEach((player) => {
     const input = players[player.playerId].input;
 
-    input.left ? player.x -= 3 : null;
-    input.right ? player.x += 3 : null;
-    input.down ? player.y += 3 : null;
-    input.up ? player.y -= 3 : null;
+    if (input.left) {
+      players[player.playerId].moving = 'left';
+      player.x -= 3
+    };
+
+    if (input.right) {
+      players[player.playerId].moving = 'right';
+      player.x += 3
+    };
+
+    if (input.down) {
+      players[player.playerId].moving = 'down';
+      player.y += 3
+    };
+
+    if (input.up) {
+      players[player.playerId].moving = 'up';
+      player.y -= 3
+    };
+
+    if (!input.left && !input.right && !input.down && !input.up) {
+      players[player.playerId].moving = false;
+    }
 
     players[player.playerId].x = player.x;
     players[player.playerId].y = player.y;
@@ -90,13 +111,14 @@ function update() {
 function handlePlayerInput(self, playerId, input) {
   self.players.getChildren().forEach((player) => {
     if (playerId === player.playerId) {
+      console.log('')
       players[player.playerId].input = input;
     }
   });
 }
 
 function addPlayer(self, playerInfo) {
-  const player = self.physics.add.image(playerInfo.x, playerInfo.y, 'ship').setOrigin(0.5, 0.5).setDisplaySize(53, 40);
+  const player = self.physics.add.image(playerInfo.x, playerInfo.y, 'ship').setOrigin(0.5, 0.5).setDisplaySize(64, 64);
   player.playerId = playerInfo.playerId;
   self.players.add(player);
 }

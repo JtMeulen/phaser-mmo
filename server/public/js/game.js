@@ -10,11 +10,17 @@ var config = {
   }
 };
 
-var game = new Phaser.Game(config);
+const game = new Phaser.Game(config);
+
+const TOTAL_CHAR_TYPES = 2
 
 function preload() {
-  this.load.image('ship', 'assets/spaceShips_001.png');
-  this.load.image('otherPlayer', 'assets/enemyBlack5.png');
+  for(let i = 1; i <= TOTAL_CHAR_TYPES; i++) {
+    console.log(i);
+    this.load.spritesheet(`character_${i}`, `assets/characters/character_${i}.png`, {
+      frameWidth: 64, frameHeight: 64
+    });
+  };
 }
 
 function create() {
@@ -24,16 +30,12 @@ function create() {
 
   this.socket.on('currentPlayers', function (players) {
     Object.keys(players).forEach(function (id) {
-      if (players[id].playerId === self.socket.id) {
-        displayPlayers(self, players[id], 'ship');
-      } else {
-        displayPlayers(self, players[id], 'otherPlayer');
-      }
+        displayPlayers(self, players[id]);
     });
   });
 
   this.socket.on('newPlayer', function (playerInfo) {
-    displayPlayers(self, playerInfo, 'otherPlayer');
+    displayPlayers(self, playerInfo);
   });
 
   this.socket.on('disconnect', function (playerId) {
@@ -48,11 +50,20 @@ function create() {
     Object.keys(players).forEach(function (id) {
       self.players.getChildren().forEach(function (player) {
         if (players[id].playerId === player.playerId) {
+
+          if(players[id].moving) {
+            player.anims.play(`${players[id].characterType}_${players[id].moving}`, true);
+          } else {
+            player.anims.stop(null)
+          }
+
           player.setPosition(players[id].x, players[id].y);
         }
       });
     });
   });
+
+  createAnimations(self);
 
   this.cursors = this.input.keyboard.createCursorKeys();
   this.leftKeyPressed = false;
@@ -77,9 +88,84 @@ function update() {
   }
 }
 
-function displayPlayers(self, playerInfo, sprite) {
-  const player = self.add.sprite(playerInfo.x, playerInfo.y, sprite).setOrigin(0.5, 0.5).setDisplaySize(53, 40);
+function displayPlayers(self, playerInfo) {
+  const player = self.add.sprite(playerInfo.x, playerInfo.y, `character_${playerInfo.characterType}`)
+  player.setOrigin(0.5, 0.5).setDisplaySize(64, 64);
 
   player.playerId = playerInfo.playerId;
   self.players.add(player);
+}
+
+function createAnimations(self) {
+  self.anims.create({
+    key: '1_up',
+    frames: self.anims.generateFrameNumbers('character_1', {
+      start: 0, end: 8
+    }),
+    frameRate: 10,
+    repeat: -1
+  });
+
+  self.anims.create({
+    key: '1_left',
+    frames: self.anims.generateFrameNumbers('character_1', {
+      start: 9, end: 17
+    }),
+    frameRate: 10,
+    repeat: -1
+  });
+
+  self.anims.create({
+    key: '1_down',
+    frames: self.anims.generateFrameNumbers('character_1', {
+      start: 18, end: 26
+    }),
+    frameRate: 10,
+    repeat: -1
+  });
+
+  self.anims.create({
+    key: '1_right',
+    frames: self.anims.generateFrameNumbers('character_1', {
+      start: 27, end: 35
+    }),
+    frameRate: 10,
+    repeat: -1
+  });
+
+  self.anims.create({
+    key: '2_up',
+    frames: self.anims.generateFrameNumbers('character_2', {
+      start: 0, end: 8
+    }),
+    frameRate: 10,
+    repeat: -1
+  });
+
+  self.anims.create({
+    key: '2_left',
+    frames: self.anims.generateFrameNumbers('character_2', {
+      start: 9, end: 17
+    }),
+    frameRate: 10,
+    repeat: -1
+  });
+
+  self.anims.create({
+    key: '2_down',
+    frames: self.anims.generateFrameNumbers('character_2', {
+      start: 18, end: 26
+    }),
+    frameRate: 10,
+    repeat: -1
+  });
+
+  self.anims.create({
+    key: '2_right',
+    frames: self.anims.generateFrameNumbers('character_2', {
+      start: 27, end: 35
+    }),
+    frameRate: 10,
+    repeat: -1
+  });
 }
