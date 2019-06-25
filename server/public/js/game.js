@@ -12,7 +12,7 @@ var config = {
 
 const game = new Phaser.Game(config);
 
-const TOTAL_CHAR_TYPES = 2
+const TOTAL_CHAR_TYPES = 3
 
 function preload() {
   for(let i = 1; i <= TOTAL_CHAR_TYPES; i++) {

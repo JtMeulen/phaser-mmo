@@ -40,7 +40,7 @@ function create() {
     players[socket.id] = {
       x: 300,
       y: 300,
-      characterType: Math.floor(Math.random() * 2) + 1, // TODO: get from database
+      characterType: Math.floor(Math.random() * 3) + 1, // TODO: get from database
       playerId: socket.id,
       moving: false,
       input: {
