@@ -60,7 +60,12 @@ app.get('/auth', function (req, res) {
 // Auth routes
 // handle sign up logic
 app.post("/register", function(req, res){
-  var newUser = new User({username: req.body.username});
+  var newUser = new User({
+    username: req.body.username,
+    data: {
+      characterType: req.body.characterType
+    }
+  });
   User.register(newUser, req.body.password, function(err, user){
       if(err){
           res.redirect('/auth');
