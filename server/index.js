@@ -57,11 +57,6 @@ app.get('/auth', function (req, res) {
   res.sendFile(__dirname + '/auth.html');
 });
 
-app.get('*', (req, res) => {
-  res.redirect('/auth');
-});
-
-
 // Auth routes
 // handle sign up logic
 app.post("/register", function(req, res){
@@ -88,6 +83,33 @@ app.post("/login", function(req, res, next){
 app.get("/logout", function(req, res){
   req.logout();
   res.redirect("/auth");
+});
+
+// get user Saved Data
+app.get("/getUserSavedData", function(req, res){
+  User.findById(res.locals.currentUser.id)
+    .then(function(data){
+        res.json(data)
+    })
+    .catch(function(err){
+        console.log(err);
+    })
+});
+
+// update user Saved Data
+app.put("/updateUserSavedData", function(req, res){
+  console.log(req.body);
+  User.findByIdAndUpdate(res.locals.currentUser.id, {$set: {"data": {
+    "x": req.body.x,
+    "y": req.body.y,
+  }}})
+    .then(function(data){
+      res.status(201).json(data)
+  });
+});
+
+app.get('*', (req, res) => {
+  res.redirect('/auth');
 });
 
 function setupAuthoritativePhaser() {

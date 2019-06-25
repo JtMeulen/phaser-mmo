@@ -21,6 +21,7 @@ function preload() {
     });
   };
 
+  this.load.image('loading_image', 'assets/shield_sword.png');
   this.load.image('terrain', 'assets/maps/terrain_atlas.png');
   this.load.tilemapTiledJSON('world_map', 'assets/maps/world_map.json');
 }
@@ -29,7 +30,42 @@ function create() {
   const self = this;
   this.socket = io();
   this.players = this.add.group();
+
+  this.loadingImage = this.add.image(400, 300, 'loading_image').setDepth(3);
+
+  // TODO TRIGGER SAVE ON EVENT
+  // NOW WE SAVE DATA ON CLICK
+  this.saveimage = this.add.image(100, 100, 'character_1').setInteractive().on('pointerdown', () => {
+    $.ajax({
+      type: 'PUT',
+      url: '/updateUserSavedData',
+      data: {
+        x: 500,
+        y: 450
+      },
+      // success: function(data) {
+      //   console.log('UPDATED PLAYER DATA');
+      // },
+      error: function(err) {
+        console.error(err);
+      }
+    });
+  } );
+
+
   this.cameras.main.setSize(800, 600);
+
+  $.ajax({
+    type: 'GET',
+    url: '/getUserSavedData',
+    success: function(data) {
+      self.loadingImage.destroy();
+      self.socket.emit('setUserStartData', data);
+    },
+    error: function(err) {
+      console.error(err);
+    }
+  });
 
   this.socket.on('currentPlayers', function (players) {
     Object.keys(players).forEach(function (id) {

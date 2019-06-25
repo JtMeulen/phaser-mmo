@@ -36,26 +36,30 @@ function create() {
 
   io.on('connection', function (socket) {
     console.log('a user connected with socket ID: ', socket.id);
+
     // create a new player and add it to our players object
-    players[socket.id] = {
-      x: 300,
-      y: 300,
-      characterType: Math.floor(Math.random() * 3) + 1, // TODO: get from database
-      playerId: socket.id,
-      moving: false,
-      input: {
-        left: false,
-        right: false,
-        up: false,
-        down: false
-      }
-    };
-    // add player to server
-    addPlayer(self, players[socket.id]);
-    // send the players object to the new player
-    socket.emit('currentPlayers', players);
-    // update all other players of the new player
-    socket.broadcast.emit('newPlayer', players[socket.id]);
+    socket.on('setUserStartData', function(data) {
+      players[socket.id] = {
+        x: data.data.x,
+        y: data.data.y,
+        characterType: data.data.characterType,
+        playerId: socket.id,
+        moving: false,
+        input: {
+          left: false,
+          right: false,
+          up: false,
+          down: false
+        }
+      };
+
+      // add player to server
+      addPlayer(self, players[socket.id]);
+      // send the players object to the new player
+      socket.emit('currentPlayers', players);
+      // update all other players of the new player
+      socket.broadcast.emit('newPlayer', players[socket.id]);
+    });
 
     socket.on('disconnect', function () {
       console.log('user disconnected with socket ID: ', socket.id);
