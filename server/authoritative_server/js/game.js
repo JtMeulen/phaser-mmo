@@ -40,6 +40,7 @@ function create() {
     // create a new player and add it to our players object
     socket.on('setUserStartData', function(data) {
       players[socket.id] = {
+        username: data.username,
         x: data.data.x,
         y: data.data.y,
         characterType: data.data.characterType,

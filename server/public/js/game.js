@@ -54,6 +54,7 @@ function create() {
 
 
   this.cameras.main.setSize(800, 600);
+  // self.cameras.setBounds(0,0,800, 600);
 
   $.ajax({
     type: 'GET',
@@ -69,9 +70,9 @@ function create() {
 
   this.socket.on('currentPlayers', function (players) {
     Object.keys(players).forEach(function (id) {
-      const followCam = players[id].playerId === self.socket.id;
+      const actingPlayer = players[id].playerId === self.socket.id;
 
-      displayPlayers(self, players[id], followCam);
+      displayPlayers(self, players[id], actingPlayer);
     });
   });
 
@@ -82,6 +83,7 @@ function create() {
   this.socket.on('disconnect', function (playerId) {
     self.players.getChildren().forEach(function (player) {
       if (playerId === player.playerId) {
+        player.username.destroy();
         player.destroy();
       }
     });
@@ -97,7 +99,7 @@ function create() {
           } else {
             player.anims.stop(null)
           }
-
+          player.username.setPosition(players[id].x, players[id].y).setDepth(3);
           player.setPosition(players[id].x, players[id].y);
         }
       });
@@ -137,13 +139,17 @@ function update() {
   }
 }
 
-function displayPlayers(self, playerInfo, followCam) {
+function displayPlayers(self, playerInfo, actingPlayer) {
   const player = self.add.sprite(playerInfo.x, playerInfo.y, `character_${playerInfo.characterType}`)
   player.setOrigin(0.5, 0.5).setDisplaySize(64, 64);
 
   player.playerId = playerInfo.playerId;
 
-  if (followCam) {
+  player.username = self.add.text(playerInfo.x, playerInfo.y, playerInfo.username);
+  player.username.setOrigin(0.5, 2.5);
+
+  if (actingPlayer) {
+    player.username.setScale(0);
     self.cameras.main.startFollow(player);
   }
 
