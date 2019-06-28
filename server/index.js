@@ -30,7 +30,8 @@ app.use(bodyParser.urlencoded({extended: false}));
 app.use(require("express-session")({
   secret: "This is secret text or what?!",
   resave: false,
-  saveUninitialized: false
+  saveUninitialized: false,
+  name: Math.floor(Math.random() * 1000000000).toString()
 }));
 app.use(passport.initialize());
 app.use(passport.session());
@@ -39,30 +40,32 @@ passport.serializeUser(User.serializeUser());
 passport.deserializeUser(User.deserializeUser());
 
 app.use(function(req, res, next){
- res.locals.currentUser = req.user;
- next();
+  res.locals.currentUser = req.user;
+  next();
 });
+
+function isLoggedIn(request, response, next) {
+  // passport adds this to the request object
+  if (request.isAuthenticated()) {
+      return next();
+  }
+  response.redirect('/auth');
+}
 
 app.use(express.static(__dirname + '/public'));
 
-app.get('/game', function (req, res) {
-  if(!res.locals.currentUser) {
-    res.redirect('/auth');
-  } else {
-    res.sendFile(__dirname + '/index.html');
-  }
+app.get('/game', isLoggedIn, function (req, res) {
+  res.sendFile(__dirname + '/index.html');
 });
 
-app.post('/submit-chatline', function (req, res, next) {
-  if(res.locals.currentUser) {
-    const { message } = req.body;
-    const { username } = res.locals.currentUser;
-    io.emit('new message', {
-      username: username,
-      message
-    });
-    res.status(200).json({ status: 'ok' });
-  }
+app.post('/submit-chatline', isLoggedIn, function (req, res, next) {
+  const { message } = req.body;
+  const { username } = res.locals.currentUser;
+  io.emit('new message', {
+    username: username,
+    message
+  });
+  res.status(200).json({ status: 'ok' });
 });
 
 app.get('/auth', function (req, res) {
@@ -101,13 +104,13 @@ app.post("/login", function(req, res, next){
 });
 
 // Log out
-app.get("/logout", function(req, res){
+app.get("/logout", isLoggedIn, function(req, res){
   req.logout();
   res.redirect("/auth");
 });
 
 // get user Saved Data
-app.get("/getUserSavedData", function(req, res){
+app.get("/getUserSavedData", isLoggedIn, function(req, res){
   User.findById(res.locals.currentUser.id)
     .then(function(data){
         res.json(data)
@@ -118,7 +121,7 @@ app.get("/getUserSavedData", function(req, res){
 });
 
 // update user Saved Data
-app.put("/updateUserSavedData", function(req, res){
+app.put("/updateUserSavedData", isLoggedIn, function(req, res){
   console.log(req.body);
   User.findByIdAndUpdate(res.locals.currentUser.id, {$set: {"data": {
     "x": req.body.x,
