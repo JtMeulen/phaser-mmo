@@ -145,14 +145,6 @@ function create() {
     });
   });
 
-  this.socket.on('loggedOut', function (data) {
-    self.players.getChildren().forEach(function (player) {
-      if (data.username === player.username) {
-        window.location.href = "/logout";
-      }
-    });
-  });
-
   this.socket.on('new message', (data) => {
     const usernameSpan = document.createElement('span');
     const usernameText = document.createTextNode(data.username + ':');

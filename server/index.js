@@ -39,18 +39,11 @@ passport.use(new LocalStrategy(User.authenticate()));
 passport.serializeUser(User.serializeUser());
 passport.deserializeUser(User.deserializeUser());
 
-let startedGame = false;
+
 app.use(function(req, res, next){
   res.locals.currentUser = req.user;
   next();
 });
-
-function hasStartedGame(req, res, next) {
-  if (!startedGame) {
-    return next();
-  }
-  res.redirect('/error')
-}
 
 function isLoggedIn(req, res, next) {
   // passport adds this to the request object
@@ -62,7 +55,7 @@ function isLoggedIn(req, res, next) {
 
 app.use(express.static(__dirname + '/public'));
 
-app.get('/game', hasStartedGame, isLoggedIn, function (req, res) {
+app.get('/game', isLoggedIn, function (req, res) {
   startedGame = true;
   res.sendFile(__dirname + '/index.html');
 });
@@ -77,7 +70,7 @@ app.post('/submit-chatline', isLoggedIn, function (req, res, next) {
   res.status(200).json({ status: 'ok' });
 });
 
-app.get('/auth', hasStartedGame, function (req, res) {
+app.get('/auth', function (req, res) {
   res.sendFile(__dirname + '/auth.html');
 });
 
@@ -114,11 +107,6 @@ app.post("/login", function(req, res, next){
 
 // Log out
 app.get("/logout", isLoggedIn, function(req, res){
-  const { username } = res.locals.currentUser;
-  io.emit('loggedOut', {
-    username: username
-  });
-  startedGame = false;
   req.logout();
   res.redirect("/auth");
 });
@@ -144,10 +132,6 @@ app.put("/updateUserSavedData", isLoggedIn, function(req, res){
     .then(function(data){
       res.status(201).json(data)
   });
-});
-
-app.get('/error', (req, res) => {
-  res.send('Something went wrong! Dont refresh your browser or open the game in another tab. Go to /logout to fix the issue');
 });
 
 app.get('*', (req, res) => {
