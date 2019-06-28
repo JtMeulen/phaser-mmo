@@ -1,6 +1,6 @@
 const inputMessage = document.getElementById('inputMessage');
 const messages = document.getElementById('messages');
-console.log(inputMessage)
+
 window.addEventListener('keydown', event => {
   if (event.which === 13) {
     sendMessage();
@@ -122,7 +122,7 @@ function create() {
   this.socket.on('disconnect', function (playerId) {
     self.players.getChildren().forEach(function (player) {
       if (playerId === player.playerId) {
-        player.username.destroy();
+        player.usernameDisplay.destroy();
         player.destroy();
       }
     });
@@ -138,10 +138,18 @@ function create() {
           } else {
             player.anims.stop(null)
           }
-          player.username.setPosition(players[id].x, players[id].y).setDepth(3);
+          player.usernameDisplay.setPosition(players[id].x, players[id].y).setDepth(3);
           player.setPosition(players[id].x, players[id].y);
         }
       });
+    });
+  });
+
+  this.socket.on('loggedOut', function (data) {
+    self.players.getChildren().forEach(function (player) {
+      if (data.username === player.username) {
+        window.location.href = "/logout";
+      }
     });
   });
 
@@ -202,12 +210,12 @@ function displayPlayers(self, playerInfo, actingPlayer) {
   player.setOrigin(0.5, 0.5).setDisplaySize(64, 64);
 
   player.playerId = playerInfo.playerId;
-
-  player.username = self.add.text(playerInfo.x, playerInfo.y, playerInfo.username);
-  player.username.setOrigin(0.5, 2.5);
+  player.username = playerInfo.username;
+  player.usernameDisplay = self.add.text(playerInfo.x, playerInfo.y, playerInfo.username);
+  player.usernameDisplay.setOrigin(0.5, 2.5);
 
   if (actingPlayer) {
-    player.username.setScale(0);
+    player.usernameDisplay.setScale(0);
     self.cameras.main.startFollow(player);
   }
 
