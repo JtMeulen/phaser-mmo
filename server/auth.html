@@ -3,36 +3,131 @@
 
     <head>
         <meta charset="utf-8">
+        <link href='https://fonts.googleapis.com/css?family=Raleway:400,800,700,900,300,100' rel='stylesheet' type='text/css'>
+        <style>
+            .overlay{
+            position:fixed;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            align-items: flex-start;
+            background: url('https://images8.alphacoders.com/707/thumb-1920-707598.jpg');
+            background-position: center;
+            top:0;
+            left:0;
+            width:100%;
+            height:100%;
+            }
+
+            h1{
+            text-align:center;
+            color: #FFF !important;
+            margin-top: 0;
+            font: 40px Raleway;
+            font-weight: 900;
+            text-shadow: 0px 4px 3px rgba(0,0,0,0.4),
+                        0px 8px 13px rgba(0,0,0,0.1),
+                        0px 18px 23px rgba(0,0,0,0.1);
+            }
+
+            .wrap {
+            height: auto;
+            width: 300px;
+            margin: 40px 20px 0;
+            padding: 20px;
+            border-radius: 10px;
+            background: rgba(0,0,0,0.5);
+            }
+
+            input{
+            width:100%;
+            padding:10px;
+            margin-bottom:20px;
+            border-radius:5px;
+            border:none;
+            outline:none;
+            font:13px Raleway;
+            -webkit-box-sizing: border-box;
+            -moz-box-sizing: border-box;
+            box-sizing: border-box;
+            }
+
+            input[type="submit"]{
+            background:#e74c3c;
+            color:#FFF;
+            width:100%;
+            padding:15px;
+            font-weight:700;
+            opacity:0.8;
+            }
+
+            input[type="submit"]:hover{
+            cursor:pointer;
+            opacity:1;
+            }
+
+            input[type="text"]:focus,
+            input[type="password"]:focus{
+            padding-right: 5px;
+            border-left:5px solid #e74c3c;
+            -webkit-transition:0.4s ease;
+            }
+
+            input[type="radio"]{ 
+            position: absolute;
+            opacity: 0;
+            width: 0;
+            height: 0;
+            }
+
+            input[type="radio"] + img {
+            margin: 0 10px 20px 0;
+            border-radius:5px;
+            cursor: pointer;
+            }
+            input[type="radio"] + img {
+            margin: 0 10px 20px 0;
+            border-radius:50%;
+            cursor: pointer;
+            }
+
+            input[type="radio"]:checked + img {
+                outline: 1px solid white;
+            }
+        </style>
     </head>
 
     <body>
-        <p>login</p>
-        <form action="/login" method="post">
-            <div class="container">
-                <label for="username"><b>Username</b></label>
-                <input type="text" placeholder="Enter Username" name="username" required>
-                <label for="password"><b>Password</b></label>
-                <input type="password" placeholder="Enter Password" name="password" required>
-                <button type="submit">Login</button>
-            </div>
-        </form>
+        <div class="overlay">
+            <form autocomplete="crm-phone-number" action="/login" method="post" class="wrap">
+                <h1>Login</h1>
+                <input type="text" placeholder="username" name="username" required>
+                <input type="password"placeholder="password" name="password" required>
+                <input type="submit" value="Sign In">
+            </form>
 
-        <p>signup</p>
-        <form action="/register" method="post">
-            <div class="container">
-                <label for="username"><b>Username</b></label>
-                <input type="text" placeholder="Enter Username" name="username" required>
-                <label for="password"><b>Password</b></label>
-                <input type="password" placeholder="Enter Password" name="password" required>
-                
-                <p>characterType</p>
-                <input checked type="radio" name="characterType" value=1> 1
-                <input type="radio" name="characterType" value=2> 2
-                <input type="radio" name="characterType" value=3> 3
-                
-                <button type="submit">signup</button>
-            </div>
-        </form>
+            <form action="/register" method="post" class="wrap">
+                <h1>Signup</h1>
+                <input type="text" placeholder="username" name="username" required>
+                <input type="password"placeholder="password" name="password" required>
+
+                <label>
+                    <input checked type="radio" name="characterType" value=1>
+                    <img src="/character_thumbnail/1">
+                </label>
+
+                <label>
+                    <input type="radio" name="characterType" value=2>
+                    <img src="/character_thumbnail/2">
+                </label>
+
+                <label>
+                    <input type="radio" name="characterType" value=3>
+                    <img src="/character_thumbnail/3">
+                </label>
+                <input type="submit" value="Register">
+            </form>
+        </div>
     </body>
 
 </html>

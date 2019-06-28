@@ -57,6 +57,10 @@ app.get('/auth', function (req, res) {
   res.sendFile(__dirname + '/auth.html');
 });
 
+app.get('/character_thumbnail/:id', function (req, res) {
+  res.sendFile(__dirname + '/public/assets/thumbnails/char_'+req.params.id+'.png');
+});
+
 // Auth routes
 // handle sign up logic
 app.post("/register", function(req, res){
