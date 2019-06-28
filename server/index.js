@@ -53,6 +53,18 @@ app.get('/game', function (req, res) {
   }
 });
 
+app.post('/submit-chatline', function (req, res, next) {
+  if(res.locals.currentUser) {
+    const { message } = req.body;
+    const { username } = res.locals.currentUser;
+    io.emit('new message', {
+      username: username,
+      message
+    });
+    res.status(200).json({ status: 'ok' });
+  }
+});
+
 app.get('/auth', function (req, res) {
   res.sendFile(__dirname + '/auth.html');
 });
