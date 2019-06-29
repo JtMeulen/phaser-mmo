@@ -45,6 +45,7 @@ function create() {
         y: data.data.y,
         characterType: data.data.characterType,
         playerId: socket.id,
+        userId: data._id,
         moving: false,
         input: {
           left: false,

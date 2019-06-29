@@ -1,6 +1,8 @@
 const inputMessage = document.getElementById('inputMessage');
 const messages = document.getElementById('messages');
 
+const activeUser = {};
+
 window.addEventListener('keydown', event => {
   if (event.which === 13) {
     sendMessage();
@@ -20,7 +22,8 @@ function sendMessage() {
       type: 'POST',
       url: '/submit-chatline',
       data: {
-        message
+        message,
+        username: activeUser.username
       },
       success: function(data) {},
       error: function(xhr) {
@@ -99,7 +102,6 @@ function create() {
     type: 'GET',
     url: '/getUserSavedData',
     success: function(data) {
-      self.loadingImage.destroy();
       self.socket.emit('setUserStartData', data);
     },
     error: function(err) {
@@ -113,6 +115,8 @@ function create() {
 
       displayPlayers(self, players[id], actingPlayer);
     });
+
+    self.loadingImage.destroy();
   });
 
   this.socket.on('newPlayer', function (playerInfo) {
@@ -207,6 +211,11 @@ function displayPlayers(self, playerInfo, actingPlayer) {
   player.usernameDisplay.setOrigin(0.5, 2.5);
 
   if (actingPlayer) {
+    console.log(playerInfo);
+    activeUser.username = playerInfo.username;
+    activeUser.userId = playerInfo.userId;
+    activeUser.socketId = playerInfo.playerId;
+
     player.usernameDisplay.setScale(0);
     self.cameras.main.startFollow(player);
   }

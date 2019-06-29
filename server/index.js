@@ -61,8 +61,7 @@ app.get('/game', isLoggedIn, function (req, res) {
 });
 
 app.post('/submit-chatline', isLoggedIn, function (req, res, next) {
-  const { message } = req.body;
-  const { username } = res.locals.currentUser;
+  const { message, username } = req.body;
   io.emit('new message', {
     username: username,
     message
