@@ -63,6 +63,10 @@ function preload() {
     });
   };
 
+  this.load.spritesheet('orc', `assets/characters/orc.png`, {
+    frameWidth: 64, frameHeight: 64
+  });
+
   this.load.image('loading_image', 'assets/shield_sword.png');
   this.load.image('terrain', 'assets/maps/terrain_atlas.png');
   this.load.tilemapTiledJSON('world_map', 'assets/maps/world_map.json');
@@ -262,7 +266,7 @@ function displayPlayers(self, playerInfo, actingPlayer) {
 }
 
 function displayEnemies(self, enemyInfo) {
-  const enemy = self.add.sprite(enemyInfo.x, enemyInfo.y, `character_1`)
+  const enemy = self.add.sprite(enemyInfo.x, enemyInfo.y, 'orc')
   enemy.setOrigin(0.5, 0.5).setDisplaySize(64, 64);
 
   enemy.id = enemyInfo.id;
