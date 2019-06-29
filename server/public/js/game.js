@@ -82,8 +82,9 @@ function create() {
       type: 'PUT',
       url: '/updateUserSavedData',
       data: {
-        x: 500,
-        y: 450
+        x: activeUser.x,
+        y: activeUser.y,
+        userId: activeUser.userId
       },
       // success: function(data) {
       //   console.log('UPDATED PLAYER DATA');
@@ -102,6 +103,7 @@ function create() {
     type: 'GET',
     url: '/getUserSavedData',
     success: function(data) {
+      console.log('got back data: ', data)
       self.socket.emit('setUserStartData', data);
     },
     error: function(err) {
@@ -144,6 +146,13 @@ function create() {
           }
           player.usernameDisplay.setPosition(players[id].x, players[id].y).setDepth(3);
           player.setPosition(players[id].x, players[id].y);
+
+
+          // update x, y pos in local user for saving to DB
+          if(activeUser.socketId === player.playerId) {
+            activeUser.x = players[id].x,
+            activeUser.y = players[id].y
+          }
         }
       });
     });

@@ -124,9 +124,9 @@ app.get("/getUserSavedData", isLoggedIn, function(req, res){
 // update user Saved Data
 app.put("/updateUserSavedData", isLoggedIn, function(req, res){
   console.log(req.body);
-  User.findByIdAndUpdate(res.locals.currentUser.id, {$set: {"data": {
+  User.findByIdAndUpdate(req.body.userId, {$set: {"data": {
     "x": req.body.x,
-    "y": req.body.y,
+    "y": req.body.y
   }}})
     .then(function(data){
       res.status(201).json(data)
