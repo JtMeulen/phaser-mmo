@@ -1,6 +1,8 @@
 const players = {};
 const enemies = {};
 
+const overlaps = {};
+
 const config = {
   type: Phaser.HEADLESS,
   parent: 'phaser-example',
@@ -33,9 +35,11 @@ function preload() {
 function create() {
   const self = this;
   this.players = this.physics.add.group();
+  this.strikezones = this.physics.add.group();
   this.enemies = this.physics.add.group();
 
   this.physics.add.collider(this.players, this.players);
+  this.physics.add.overlap(this.strikezones, this.enemies, meetingEnemy);
   this.physics.add.collider(this.enemies, this.players);
   this.physics.add.collider(this.enemies, this.enemies);
 
@@ -136,21 +140,25 @@ function update() {
 
     if (input.left && !player.body.touching.left) {
       players[player.playerId].moving = 'left';
+      player.facing = 'left'
       player.setVelocityX(-100);
     };
 
     if (input.right && !player.body.touching.right) {
       players[player.playerId].moving = 'right';
+      player.facing = 'right'
       player.setVelocityX(100);
     };
 
     if (input.down && !player.body.touching.down) {
       players[player.playerId].moving = 'down';
+      player.facing = 'down'
       player.setVelocityY(100);
     };
 
     if (input.up && !player.body.touching.up) {
       players[player.playerId].moving = 'up';
+      player.facing = 'up'
       player.setVelocityY(-100);
     };
 
@@ -158,6 +166,18 @@ function update() {
       player.setVelocity(0, 0);
       players[player.playerId].moving = false;
     }
+
+    this.strikezones.getChildren().forEach((zone) => {
+      if(!zone.body.embedded) {
+        while (overlaps[zone.id].length) {
+          overlaps[zone.id].pop();
+        }
+      };
+      if(zone.id === player.playerId) {
+        zone.setX(player.x);
+        zone.setY(player.y);
+      };
+    });
 
     players[player.playerId].x = player.x;
     players[player.playerId].y = player.y;
@@ -206,9 +226,16 @@ function moveEnemies () {
   });
 
   setTimeout(() => {
+    console.log(overlaps)
     this.enemies.setVelocityX(0);
     this.enemies.setVelocityY(0);
   }, 500);
+}
+
+function meetingEnemy(player, enemy) {
+  if(overlaps[player.id].indexOf(enemy.id) === -1) {
+    overlaps[player.id].push(enemy.id);
+  }
 }
 
 function handlePlayerInput(self, playerId, input) {
@@ -222,10 +249,18 @@ function handlePlayerInput(self, playerId, input) {
 function addPlayer(self, playerInfo) {
   const player = self.physics.add.sprite(playerInfo.x, playerInfo.y, 'character_1')
   .setOrigin(0.5, 0.5).setDisplaySize(30, 45);
+
+  const strikezone = self.physics.add.sprite(playerInfo.x, playerInfo.y)
+  .setOrigin(0.5, 0.5).setDisplaySize(100, 100);
+
   player.playerId = playerInfo.playerId;
   player.setBounce(0);
   player.setCollideWorldBounds(true);
+
+  strikezone.id = playerInfo.playerId;
   self.players.add(player);
+  self.strikezones.add(strikezone);
+  overlaps[playerInfo.playerId] = [];
 }
 
 function addEnemy(self, x, y, id) {
