@@ -133,6 +133,10 @@ app.put("/updateUserSavedData", isLoggedIn, function(req, res){
   });
 });
 
+app.get('/error', function (req, res) {
+  res.sendFile(__dirname + '/error.html');
+});
+
 app.get('*', (req, res) => {
   res.redirect('/auth');
 });

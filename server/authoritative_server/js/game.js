@@ -1,4 +1,5 @@
 const players = {};
+const enemies = {};
 
 const config = {
   type: Phaser.HEADLESS,
@@ -32,7 +33,24 @@ function preload() {
 function create() {
   const self = this;
   this.players = this.physics.add.group();
+  this.enemies = this.physics.add.group();
+
   this.physics.add.collider(this.players, this.players);
+  this.physics.add.collider(this.enemies, this.players);
+  this.physics.add.collider(this.enemies, this.enemies);
+
+  // CREATE ENEMIES ON SERVER START
+  for(let i = 0; i < 10 ;i++) {
+    const x = Phaser.Math.Between(300, 800);
+    const y = Phaser.Math.Between(300, 800);
+    const id = Phaser.Math.Between(1, 999999);
+    addEnemy(self, x, y, id);
+    enemies[id] = {
+      x: x,
+      y: y,
+      id: id
+    }
+  }
 
   io.on('connection', function (socket) {
     console.log('a user connected with socket ID: ', socket.id);
@@ -69,6 +87,7 @@ function create() {
       addPlayer(self, players[socket.id]);
       // send the players object to the new player
       socket.emit('currentPlayers', players);
+      socket.emit('currentEnemies', enemies);
       // update all other players of the new player
       socket.broadcast.emit('newPlayer', players[socket.id]);
     });
@@ -96,6 +115,8 @@ function create() {
   const topLayer = world_map.createStaticLayer('top', [terrain], 0, 0);
   this.physics.add.collider(this.players, bottomLayer);
   this.physics.add.collider(this.players, topLayer);
+  this.physics.add.collider(this.enemies, bottomLayer);
+  this.physics.add.collider(this.enemies, topLayer);
   bottomLayer.setCollisionByProperty({collides: true});
   topLayer.setCollisionByProperty({collides: true});
 }
@@ -133,7 +154,19 @@ function update() {
     players[player.playerId].y = player.y;
   });
 
+  // update enemy positions
+  this.enemies.getChildren().forEach((enemy) => {
+
+    if(!enemy.body.touching.none) {
+      enemy.setVelocity(0,0);
+    }
+
+    enemies[enemy.id].x = enemy.x;
+    enemies[enemy.id].y = enemy.y;
+  });
+
   io.emit('playerUpdates', players);
+  io.emit('enemiesUpdates', enemies);
 }
 
 function handlePlayerInput(self, playerId, input) {
@@ -151,6 +184,15 @@ function addPlayer(self, playerInfo) {
   player.setBounce(0);
   player.setCollideWorldBounds(true);
   self.players.add(player);
+}
+
+function addEnemy(self, x, y, id) {
+  const enemy = self.physics.add.sprite(x, y, 'character_1')
+  .setOrigin(0.5, 0.5).setDisplaySize(30, 45);
+  enemy.id = id
+  enemy.setBounce(0);
+  enemy.setCollideWorldBounds(true);
+  self.enemies.add(enemy);
 }
 
 function removePlayer(self, playerId) {

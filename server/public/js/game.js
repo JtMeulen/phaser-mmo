@@ -72,6 +72,7 @@ function create() {
   const self = this;
   this.socket = io();
   this.players = this.add.group();
+  this.enemies = this.add.group();
 
   this.loadingImage = this.add.image(400, 300, 'loading_image').setDepth(3);
 
@@ -121,6 +122,12 @@ function create() {
     self.loadingImage.destroy();
   });
 
+  this.socket.on('currentEnemies', function (enemies) {
+    Object.keys(enemies).forEach(function (id) {
+      displayEnemies(self, enemies[id]);
+    });
+  });
+
   this.socket.on('logoutDuplicate', function () {
     window.location.href = "/error";
   });
@@ -157,6 +164,23 @@ function create() {
             activeUser.x = players[id].x,
             activeUser.y = players[id].y
           }
+        }
+      });
+    });
+  });
+
+  this.socket.on('enemiesUpdates', function (enemies) {
+    Object.keys(enemies).forEach(function (id) {
+      self.enemies.getChildren().forEach(function (enemy) {
+        if (enemies[id].id === enemy.id) {
+
+          // if(enemies[id].moving) {
+          //   enemy.anims.play(`${enemies[id].characterType}_${enemies[id].moving}`, true);
+          // } else {
+          //   enemy.anims.stop(null)
+          // }
+          enemy.usernameDisplay.setPosition(enemies[id].x, enemies[id].y).setDepth(3);
+          enemy.setPosition(enemies[id].x, enemies[id].y);
         }
       });
     });
@@ -221,6 +245,7 @@ function displayPlayers(self, playerInfo, actingPlayer) {
   player.playerId = playerInfo.playerId;
   player.username = playerInfo.username;
   player.usernameDisplay = self.add.text(playerInfo.x, playerInfo.y, playerInfo.username);
+  player.usernameDisplay.setColor("#00ff00");;
   player.usernameDisplay.setOrigin(0.5, 2.5);
 
   if (actingPlayer) {
@@ -234,6 +259,18 @@ function displayPlayers(self, playerInfo, actingPlayer) {
   }
 
   self.players.add(player);
+}
+
+function displayEnemies(self, enemyInfo) {
+  const enemy = self.add.sprite(enemyInfo.x, enemyInfo.y, `character_1`)
+  enemy.setOrigin(0.5, 0.5).setDisplaySize(64, 64);
+
+  enemy.id = enemyInfo.id;
+  enemy.usernameDisplay = self.add.text(enemyInfo.x, enemyInfo.y, enemyInfo.id);
+  enemy.usernameDisplay.setColor("#ff0000");
+  enemy.usernameDisplay.setOrigin(0.5, 2.5);
+
+  self.enemies.add(enemy);
 }
 
 function createAnimations(self) {
