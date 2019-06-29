@@ -37,6 +37,7 @@ function create() {
   io.on('connection', function (socket) {
     console.log('a user connected with socket ID: ', socket.id);
 
+    const alreadyActiveUsers = {...players};
     // create a new player and add it to our players object
     socket.on('setUserStartData', function(data) {
       players[socket.id] = {
@@ -54,6 +55,15 @@ function create() {
           down: false
         }
       };
+
+      // Logout the already playing user if logged in second time
+      for (var playerId in alreadyActiveUsers) {
+        // found user already with this character playing
+        if(alreadyActiveUsers[playerId].userId === data._id) {
+          console.log('already active: ', alreadyActiveUsers[playerId]);
+          io.to(alreadyActiveUsers[playerId].playerId).emit('logoutDuplicate');
+        }
+      }
 
       // add player to server
       addPlayer(self, players[socket.id]);

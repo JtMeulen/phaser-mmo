@@ -86,9 +86,9 @@ function create() {
         y: activeUser.y,
         userId: activeUser.userId
       },
-      // success: function(data) {
-      //   console.log('UPDATED PLAYER DATA');
-      // },
+      success: function() {
+        console.log('UPDATED PLAYER DATA');
+      },
       error: function(err) {
         console.error(err);
       }
@@ -119,6 +119,10 @@ function create() {
     });
 
     self.loadingImage.destroy();
+  });
+
+  this.socket.on('logoutDuplicate', function () {
+    window.location.href = "/error";
   });
 
   this.socket.on('newPlayer', function (playerInfo) {
