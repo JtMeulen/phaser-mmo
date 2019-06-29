@@ -48,9 +48,18 @@ function create() {
     enemies[id] = {
       x: x,
       y: y,
-      id: id
+      id: id,
+      moving: false
     }
   }
+
+  // move enemies
+  this.timedEvent = this.time.addEvent({
+    delay: 600,
+    callback: moveEnemies,
+    callbackScope: this,
+    loop: true
+  });
 
   io.on('connection', function (socket) {
     console.log('a user connected with socket ID: ', socket.id);
@@ -169,6 +178,39 @@ function update() {
   io.emit('enemiesUpdates', enemies);
 }
 
+function moveEnemies () {
+  this.enemies.getChildren().forEach((enemy) => {
+    const randNumber = Math.floor((Math.random() * 20) + 1);
+
+    switch(randNumber) {
+      case 1:
+        enemy.setVelocityX(100);
+        enemies[enemy.id].moving = 'right';
+        break;
+      case 2:
+        enemy.setVelocityX(-100);
+        enemies[enemy.id].moving = 'left';
+        break;
+      case 3:
+        enemy.setVelocityY(100);
+        enemies[enemy.id].moving = 'down';
+        break;
+      case 4:
+        enemy.setVelocityY(-100);
+        enemies[enemy.id].moving = 'up';
+        break;
+      default:
+        enemies[enemy.id].moving = false;
+        null;
+    }
+  });
+
+  setTimeout(() => {
+    this.enemies.setVelocityX(0);
+    this.enemies.setVelocityY(0);
+  }, 500);
+}
+
 function handlePlayerInput(self, playerId, input) {
   self.players.getChildren().forEach((player) => {
     if (playerId === player.playerId) {
@@ -189,7 +231,7 @@ function addPlayer(self, playerInfo) {
 function addEnemy(self, x, y, id) {
   const enemy = self.physics.add.sprite(x, y, 'character_1')
   .setOrigin(0.5, 0.5).setDisplaySize(30, 45);
-  enemy.id = id
+  enemy.id = id;
   enemy.setBounce(0);
   enemy.setCollideWorldBounds(true);
   self.enemies.add(enemy);

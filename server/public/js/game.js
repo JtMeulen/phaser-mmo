@@ -178,11 +178,11 @@ function create() {
       self.enemies.getChildren().forEach(function (enemy) {
         if (enemies[id].id === enemy.id) {
 
-          // if(enemies[id].moving) {
-          //   enemy.anims.play(`${enemies[id].characterType}_${enemies[id].moving}`, true);
-          // } else {
-          //   enemy.anims.stop(null)
-          // }
+          if(enemies[id].moving) {
+            enemy.anims.play(`orc_${enemies[id].moving}`, true);
+          } else {
+            enemy.anims.stop(null)
+          }
           enemy.usernameDisplay.setPosition(enemies[id].x, enemies[id].y).setDepth(3);
           enemy.setPosition(enemies[id].x, enemies[id].y);
         }
@@ -315,4 +315,41 @@ function createAnimations(self) {
       repeat: -1
     });
   };
+
+  // ENEMY MOVING
+  self.anims.create({
+    key: `orc_up`,
+    frames: self.anims.generateFrameNumbers(`orc`, {
+      start: 0, end: 8
+    }),
+    frameRate: 10,
+    repeat: -1
+  });
+
+  self.anims.create({
+    key: `orc_left`,
+    frames: self.anims.generateFrameNumbers(`orc`, {
+      start: 9, end: 17
+    }),
+    frameRate: 10,
+    repeat: -1
+  });
+
+  self.anims.create({
+    key: `orc_down`,
+    frames: self.anims.generateFrameNumbers(`orc`, {
+      start: 18, end: 26
+    }),
+    frameRate: 10,
+    repeat: -1
+  });
+
+  self.anims.create({
+    key: `orc_right`,
+    frames: self.anims.generateFrameNumbers(`orc`, {
+      start: 27, end: 35
+    }),
+    frameRate: 10,
+    repeat: -1
+  });
 }
