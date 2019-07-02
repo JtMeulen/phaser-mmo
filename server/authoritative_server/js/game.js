@@ -119,6 +119,11 @@ function create() {
     socket.on('playerInput', function (inputData) {
       handlePlayerInput(self, socket.id, inputData);
     });
+
+    // when a player attack, check for enemy damage
+    socket.on('attack', function (inputData) {
+      handleAttack(self, socket.id, inputData);
+    });
   });
 
   const world_map = this.add.tilemap('world_map');
@@ -168,11 +173,13 @@ function update() {
     }
 
     this.strikezones.getChildren().forEach((zone) => {
+      // Empty the array if there is no enemy inside the zone
       if(!zone.body.embedded) {
         while (overlaps[zone.id].length) {
           overlaps[zone.id].pop();
         }
       };
+      // set zone position to player position
       if(zone.id === player.playerId) {
         zone.setX(player.x);
         zone.setY(player.y);
@@ -226,7 +233,6 @@ function moveEnemies () {
   });
 
   setTimeout(() => {
-    console.log(overlaps)
     this.enemies.setVelocityX(0);
     this.enemies.setVelocityY(0);
   }, 500);
@@ -244,6 +250,43 @@ function handlePlayerInput(self, playerId, input) {
       players[player.playerId].input = input;
     }
   });
+}
+
+function handleAttack(self, playerId, input) {
+  console.log('Attack and found: ', overlaps[playerId])
+  if (overlaps[playerId].length > 0){
+    killEnemy(self, overlaps[playerId])
+  }
+}
+
+function killEnemy(self, enemyArr) {
+  self.enemies.getChildren().forEach((enemy) => {
+    if (enemyArr.includes(enemy.id)) {
+      io.emit('killenemy', enemy.id);
+      enemy.destroy();
+      delete enemies[enemy.id];
+
+      spawnNewEnemy(self);
+    }
+  });
+}
+
+function spawnNewEnemy(self) {
+  // create new enemy
+  setTimeout(() => {
+
+  const x = Phaser.Math.Between(300, 800);
+  const y = Phaser.Math.Between(300, 800);
+  const id = Phaser.Math.Between(1, 999999);
+  addEnemy(self, x, y, id);
+  enemies[id] = {
+    x: x,
+    y: y,
+    id: id,
+    moving: false
+  }
+  io.emit('newEnemy', enemies[id]);
+  }, 10000);
 }
 
 function addPlayer(self, playerInfo) {
@@ -273,6 +316,7 @@ function addEnemy(self, x, y, id) {
 }
 
 function removePlayer(self, playerId) {
+  // TODO: remove  overlaps[playerId]
   self.players.getChildren().forEach((player) => {
     if (playerId === player.playerId) {
       player.destroy();

@@ -132,12 +132,25 @@ function create() {
     });
   });
 
+  this.socket.on('newEnemy', function (enemyInfo) {
+    displayEnemies(self, enemyInfo);
+  });
+
   this.socket.on('logoutDuplicate', function () {
     window.location.href = "/error";
   });
 
   this.socket.on('newPlayer', function (playerInfo) {
     displayPlayers(self, playerInfo);
+  });
+
+  this.socket.on('killenemy', function (enemyId) {
+    self.enemies.getChildren().forEach(function (enemy) {
+      if (enemyId === enemy.id) {
+        enemy.usernameDisplay.destroy();
+        enemy.destroy();
+      }
+    });
   });
 
   this.socket.on('disconnect', function (playerId) {
@@ -220,6 +233,7 @@ function create() {
   topLayer.setCollisionByProperty({collides: true});
 
   this.cursors = this.input.keyboard.createCursorKeys();
+  this.one = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.ONE);
   this.leftKeyPressed = false;
   this.rightKeyPressed = false;
   this.downKeyPressed = false;
@@ -239,6 +253,11 @@ function update() {
 
   if (left !== this.leftKeyPressed || right !== this.rightKeyPressed || up !== this.upKeyPressed || down !== this.downKeyPressed) {
     this.socket.emit('playerInput', { left: this.leftKeyPressed , right: this.rightKeyPressed, up: this.upKeyPressed, down: this.downKeyPressed });
+  }
+
+  if (Phaser.Input.Keyboard.JustDown(this.one)){
+    console.log('1');
+    this.socket.emit('attack', {attack: '1'});
   }
 }
 
