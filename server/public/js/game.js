@@ -67,6 +67,7 @@ function preload() {
     frameWidth: 64, frameHeight: 64
   });
 
+  this.load.image('corpse', 'assets/characters/corpse.png');
   this.load.image('loading_image', 'assets/shield_sword.png');
   this.load.image('terrain', 'assets/maps/terrain_atlas.png');
   this.load.tilemapTiledJSON('world_map', 'assets/maps/world_map.json');
@@ -148,7 +149,8 @@ function create() {
     self.enemies.getChildren().forEach(function (enemy) {
       if (enemyId === enemy.id) {
         enemy.usernameDisplay.destroy();
-        enemy.destroy();
+        enemy.setTexture('corpse').setDepth(-1);
+        setTimeout(() => {enemy.destroy()}, 5000);
       }
     });
   });
